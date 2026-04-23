@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Recomendación Musical NCF — Presentación</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #222; }
+
+  .slide {
+    width: 960px;
+    min-height: 540px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  /* ── PORTADA ── */
+  .cover {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #1565c0 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 80px;
+    min-height: 540px;
+  }
+  .cover .badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 6px 20px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+  .cover h1 { font-size: 38px; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+  .cover h2 { font-size: 20px; font-weight: 300; opacity: 0.85; margin-bottom: 40px; }
+  .cover .divider { width: 60px; height: 3px; background: #42a5f5; margin: 0 auto 30px; }
+  .cover .meta { font-size: 14px; opacity: 0.7; line-height: 2; }
+  .cover .meta strong { opacity: 1; }
+
+  /* ── HEADER DE SLIDE NORMAL ── */
+  .slide-header {
+    background: linear-gradient(90deg, #1a237e, #1565c0);
+    color: #fff;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .slide-header .num {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex-shrink: 0;
+  }
+  .slide-header h2 { font-size: 20px; font-weight: 600; }
+  .slide-header .sub { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+
+  .slide-body { padding: 32px 40px; }
+
+  /* ── CARDS ── */
+  .cards { display: grid; gap: 16px; }
+  .cards.two { grid-template-columns: 1fr 1fr; }
+  .cards.three { grid-template-columns: 1fr 1fr 1fr; }
+  .card {
+    background: #f8f9ff;
+    border: 1px solid #e3e8f0;
+    border-left: 4px solid #1565c0;
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+  .card h3 { font-size: 13px; font-weight: 700; color: #1565c0; text-transform: uppercase;
+             letter-spacing: 0.5px; margin-bottom: 10px; }
+  .card p, .card li { font-size: 14px; color: #444; line-height: 1.6; }
+  .card ul { padding-left: 16px; }
+  .card .big-num { font-size: 32px; font-weight: 700; color: #1a237e; }
+  .card .unit { font-size: 13px; color: #888; margin-top: 2px; }
+
+  /* ── ESTRUCTURA DE REPO ── */
+  .tree {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .tree .dir { color: #89b4fa; font-weight: 700; }
+  .tree .file { color: #a6e3a1; }
+  .tree .comment { color: #6c7086; }
+
+  /* ── TABLA ── */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: #1a237e; color: #fff; padding: 10px 16px; text-align: left; font-weight: 600; }
+  td { padding: 9px 16px; border-bottom: 1px solid #e8edf5; }
+  tr:nth-child(even) td { background: #f5f7ff; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex; align-items: center; gap: 0;
+    margin: 20px 0; flex-wrap: wrap;
+  }
+  .pipe-step {
+    background: linear-gradient(135deg, #1565c0, #1a237e);
+    color: #fff;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+    flex: 1;
+  }
+  .pipe-arrow {
+    font-size: 20px; color: #1565c0; padding: 0 6px; flex-shrink: 0;
+  }
+
+  /* ── ARQUITECTURA ── */
+  .arch-row {
+    display: flex; gap: 8px; align-items: center; margin: 6px 0;
+  }
+  .arch-box {
+    background: #e8f4fd;
+    border: 2px solid #1565c0;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a237e;
+    text-align: center;
+    flex: 1;
+  }
+  .arch-box.concat { background: #fff3e0; border-color: #f57c00; color: #e65100; }
+  .arch-box.output { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+  .arch-arrow { font-size: 18px; color: #666; flex-shrink: 0; }
+
+  /* ── MÉTRICAS ── */
+  .metric-bar-wrap { margin: 12px 0; }
+  .metric-label { display: flex; justify-content: space-between; font-size: 13px;
+                  font-weight: 600; margin-bottom: 5px; }
+  .metric-bar-bg { background: #e8edf5; border-radius: 4px; height: 22px; overflow: hidden; }
+  .metric-bar { height: 100%; border-radius: 4px; display: flex; align-items: center;
+               padding-left: 10px; font-size: 12px; font-weight: 700; color: #fff; }
+  .bar-ncf { background: linear-gradient(90deg, #f57c00, #ff9800); }
+  .bar-svd { background: linear-gradient(90deg, #1565c0, #1e88e5); }
+
+  /* ── LOSS CURVE simulada ── */
+  .loss-table { font-size: 12px; }
+  .loss-table td { padding: 4px 10px; }
+
+  /* ── CONCLUSIONES ── */
+  .conclusion-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: #f8f9ff; border-radius: 6px; padding: 14px 18px;
+    margin-bottom: 12px; border-left: 4px solid #1565c0;
+  }
+  .conclusion-item .icon { font-size: 22px; flex-shrink: 0; }
+  .conclusion-item h4 { font-size: 14px; font-weight: 700; color: #1a237e; margin-bottom: 4px; }
+  .conclusion-item p { font-size: 13px; color: #555; line-height: 1.5; }
+
+  /* ── TAG CHIPS ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tag {
+    background: #e3eafc; color: #1a237e; border-radius: 12px;
+    padding: 4px 12px; font-size: 12px; font-weight: 600;
+  }
+
+  /* ── GITHUB ── */
+  .github-box {
+    background: #0d1117; color: #e6edf3; border-radius: 8px;
+    padding: 16px 22px; font-family: monospace; font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .github-box .repo-name { color: #58a6ff; font-size: 16px; font-weight: 700; }
+  .github-box .url { color: #79c0ff; font-size: 12px; }
+
+  /* ── FOOTER ── */
+  .slide-footer {
+    background: #f5f7ff; border-top: 1px solid #e3e8f0;
+    padding: 8px 40px; display: flex; justify-content: space-between;
+    align-items: center; font-size: 11px; color: #888;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .slide { box-shadow: none; margin: 0; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 1 — PORTADA
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="cover">
+    <div class="badge">Módulo 2 — Inteligencia Artificial</div>
+    <h1>Sistema de Recomendación Musical<br>con NCF Híbrido</h1>
+    <div class="divider"></div>
+    <h2>Neural Collaborative Filtering aplicado al dataset Last.fm</h2>
+    <div class="meta">
+      <strong>Dataset:</strong> HetRec 2011 Last.fm &nbsp;|&nbsp;
+      <strong>Modelo:</strong> NCF Híbrido (Embeddings + MLP + TF-IDF)<br>
+      <strong>Repositorio:</strong> github.com/miguel-anay/music-recommender-ncf<br>
+      <strong>Autor:</strong> Miguel Anay &nbsp;|&nbsp; 2025
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 2 — PUNTO 1: CONFIGURACIÓN DEL PROYECTO
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">1</div>
+    <div>
+      <h2>Configuración del Proyecto</h2>
+      <div class="sub">Repositorio GitHub con estructura profesional</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="cards two" style="margin-bottom:20px">
+      <div>
+        <div class="github-box">
+          <div class="repo-name">music-recommender-ncf</div>
+          <div class="url">github.com/miguel-anay/music-recommender-ncf</div>
+        </div>
+        <div class="card">
+          <h3>Tecnologías</h3>
+          <div class="tags">
+            <span class="tag">Python 3.12</span>
+            <span class="tag">PyTorch</span>
+            <span class="tag">scikit-learn</span>
+            <span class="tag">pandas</span>
+            <span class="tag">NetworkX</span>
+            <span class="tag">matplotlib</span>
+            <span class="tag">Google Colab</span>
+            <span class="tag">VS Code</span>
+          </div>
+        </div>
+      </div>
+      <div class="tree">
+        <span class="dir">music-recommender-ncf/</span><br>
+        &nbsp;├── <span class="dir">notebooks/</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">01_EDA.ipynb</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">02_data_prep.ipynb</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">03_modelo_ncf.ipynb</span><br>
+        &nbsp;│&nbsp;&nbsp; └── <span class="file">04_evaluacion.ipynb</span><br>
+        &nbsp;├── <span class="dir">src/</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">config.py</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">dataset.py</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">model.py</span><br>
+        &nbsp;│&nbsp;&nbsp; ├── <span class="file">train.py</span><br>
+        &nbsp;│&nbsp;&nbsp; └── <span class="file">metrics.py</span><br>
+        &nbsp;├── <span class="dir">data/lastfm/</span>&nbsp;<span class="comment"># HetRec 2011</span><br>
+        &nbsp;├── <span class="dir">results/</span>&nbsp;<span class="comment"># modelos y gráficas</span><br>
+        &nbsp;└── <span class="file">README.md</span>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>1 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 3 — DATASET
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">1</div>
+    <div>
+      <h2>Dataset con Metadatos Ricos</h2>
+      <div class="sub">HetRec 2011 Last.fm — dataset heterogéneo de escucha musical</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="cards three" style="margin-bottom:20px">
+      <div class="card" style="text-align:center">
+        <h3>Usuarios</h3>
+        <div class="big-num">1,892</div>
+        <div class="unit">oyentes únicos</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <h3>Artistas</h3>
+        <div class="big-num">17,632</div>
+        <div class="unit">artistas registrados</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <h3>Interacciones</h3>
+        <div class="big-num">92,834</div>
+        <div class="unit">pares usuario-artista</div>
+      </div>
+    </div>
+    <div class="cards two">
+      <div class="card">
+        <h3>Metadatos Disponibles</h3>
+        <ul>
+          <li><strong>Ratings implícitos:</strong> conteo de reproducciones (weight)</li>
+          <li><strong>Tags semánticos:</strong> 11,946 etiquetas únicas (rock, pop, ambient…)</li>
+          <li><strong>Red social:</strong> 25,434 relaciones de amistad entre usuarios</li>
+          <li><strong>Timestamps:</strong> fecha de cada tag aplicado</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Características Clave</h3>
+        <ul>
+          <li><strong>Sparsity:</strong> 99.72% — típico de sistemas reales</li>
+          <li><strong>Feedback implícito:</strong> reproducciones, no ratings explícitos</li>
+          <li><strong>Datos ricos:</strong> combina CF + contenido + grafo social</li>
+          <li><strong>Red social:</strong> 98 componentes conectados</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>2 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 4 — EDA
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">1</div>
+    <div>
+      <h2>Análisis Exploratorio de Datos (EDA)</h2>
+      <div class="sub">Distribuciones, top artistas, tags y red social</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="cards two" style="margin-bottom:16px">
+      <div class="card">
+        <h3>Distribución de Reproducciones</h3>
+        <p>La distribución de plays por usuario sigue una <strong>ley de potencia</strong>: pocos usuarios muy activos y una gran mayoría con reproducciones moderadas. Esto es típico en sistemas de recomendación musical reales.</p>
+      </div>
+      <div class="card">
+        <h3>Top Tags más usados</h3>
+        <div class="tags" style="margin-top:6px">
+          <span class="tag">rock</span><span class="tag">pop</span>
+          <span class="tag">electronic</span><span class="tag">alternative</span>
+          <span class="tag">indie</span><span class="tag">ambient</span>
+          <span class="tag">blues</span><span class="tag">british</span>
+          <span class="tag">acoustic</span><span class="tag">80s</span>
+        </div>
+      </div>
+    </div>
+    <div class="cards three">
+      <div class="card">
+        <h3>Sparsity de la Matriz</h3>
+        <div class="big-num">99.72%</div>
+        <div class="unit">de la matriz usuario-artista está vacía</div>
+      </div>
+      <div class="card">
+        <h3>Red Social</h3>
+        <p>Grafo de amistades: <strong>25,434 conexiones</strong> entre usuarios. Muestra de 150 nodos revela <strong>98 componentes</strong> conectados → clusters de oyentes similares.</p>
+      </div>
+      <div class="card">
+        <h3>Tags por Artista</h3>
+        <p><strong>11,946 tags únicos</strong> disponibles. Vectorizados con TF-IDF en 50 dimensiones para capturar similitud semántica entre artistas.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>3 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 5 — PREPARACIÓN DE DATOS
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">2</div>
+    <div>
+      <h2>Preparación de Datos para Deep Learning</h2>
+      <div class="sub">Filtrado → Binarización → TF-IDF → Split → Negative Sampling</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="pipeline" style="margin-bottom:22px">
+      <div class="pipe-step">Datos<br>Crudos<br><small>92,834</small></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Filtrado<br>≥5 interact.<br><small>71,411</small></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Binarización<br>log1p + umbral<br><small>50/50</small></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">TF-IDF<br>Tags → 50d<br><small>(2828×50)</small></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Split<br>80/20<br><small>64,795/6,616</small></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Neg. Sampling<br>4:1<br><small>145,580</small></div>
+    </div>
+    <div class="cards two">
+      <div class="card">
+        <h3>Binarización (Feedback Implícito)</h3>
+        <ul>
+          <li>Se aplica <strong>log1p(weight)</strong> para suavizar la distribución</li>
+          <li>Umbral en la mediana → etiqueta 1 (like) o 0 (dislike)</li>
+          <li>Resultado: <strong>35,732 likes</strong> y <strong>35,679 dislikes</strong> (casi balanceado)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Negative Sampling</h3>
+        <ul>
+          <li>Por cada interacción positiva → 4 pares negativos aleatorios</li>
+          <li>Dataset final: <strong>145,580 pares</strong> de entrenamiento</li>
+          <li>Garantiza que el modelo aprenda a distinguir preferencias</li>
+          <li>Sin data leakage verificado entre train y test ✓</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>4 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 6 — MODELO NCF
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">3</div>
+    <div>
+      <h2>Modelo NCF Híbrido</h2>
+      <div class="sub">Neural Collaborative Filtering + Features de Contenido (TF-IDF)</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="cards two">
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <h3>Arquitectura</h3>
+          <div class="arch-row">
+            <div class="arch-box">User Emb<br><small>1874 × 64d</small></div>
+            <div class="arch-arrow">+</div>
+            <div class="arch-box">Artist Emb<br><small>2828 × 64d</small></div>
+            <div class="arch-arrow">+</div>
+            <div class="arch-box">Tag Proj<br><small>50→64d</small></div>
+          </div>
+          <div class="arch-row" style="margin-top:4px">
+            <div class="arch-box concat">Concat → 192d</div>
+          </div>
+          <div class="arch-row" style="margin-top:4px">
+            <div class="arch-box">Linear 192→128 + ReLU + Dropout(0.2)</div>
+          </div>
+          <div class="arch-row" style="margin-top:4px">
+            <div class="arch-box">Linear 128→64 + ReLU + Dropout(0.2)</div>
+          </div>
+          <div class="arch-row" style="margin-top:4px">
+            <div class="arch-box output">Linear 64→1 + Sigmoid → Probabilidad</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <h3>Hiperparámetros</h3>
+          <table style="font-size:13px">
+            <tr><td><strong>Embedding dim</strong></td><td>64</td></tr>
+            <tr><td><strong>Épocas</strong></td><td>20</td></tr>
+            <tr><td><strong>Batch size</strong></td><td>256</td></tr>
+            <tr><td><strong>Learning rate</strong></td><td>0.001 (Adam)</td></tr>
+            <tr><td><strong>Loss</strong></td><td>BCELoss</td></tr>
+            <tr><td><strong>Neg. ratio</strong></td><td>4:1</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Curva de Entrenamiento</h3>
+          <p style="font-size:14px; margin-bottom:8px">
+            <strong>Loss inicial:</strong> 0.4132 &nbsp;→&nbsp; <strong>Loss final:</strong> 0.0813<br>
+            <strong>Reducción:</strong> 80.3% en 20 épocas
+          </p>
+          <div class="metric-bar-wrap">
+            <div class="metric-label"><span>Época 1</span><span>0.4132</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar bar-svd" style="width:100%">BCELoss</div></div>
+          </div>
+          <div class="metric-bar-wrap">
+            <div class="metric-label"><span>Época 10</span><span>0.1741</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar bar-svd" style="width:42%">BCELoss</div></div>
+          </div>
+          <div class="metric-bar-wrap">
+            <div class="metric-label"><span>Época 20</span><span>0.0813</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar bar-ncf" style="width:20%">BCELoss</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>5 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 7 — EVALUACIÓN
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">4</div>
+    <div>
+      <h2>Evaluación y Análisis de Resultados</h2>
+      <div class="sub">NCF Híbrido vs SVD Baseline — métricas Hit Rate@10 y NDCG@10</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="cards two" style="margin-bottom:20px">
+      <div class="card">
+        <h3>Hit Rate@10</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:12px">¿Está el artista real entre los 10 recomendados?</p>
+        <div class="metric-bar-wrap">
+          <div class="metric-label"><span>SVD Baseline</span><span><strong>0.7400</strong></span></div>
+          <div class="metric-bar-bg"><div class="metric-bar bar-svd" style="width:74%">74.0%</div></div>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-label"><span>NCF Híbrido</span><span><strong>0.7000</strong></span></div>
+          <div class="metric-bar-bg"><div class="metric-bar bar-ncf" style="width:70%">70.0%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>NDCG@10</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:12px">¿Qué tan bien está posicionada la recomendación relevante?</p>
+        <div class="metric-bar-wrap">
+          <div class="metric-label"><span>SVD Baseline</span><span><strong>0.4607</strong></span></div>
+          <div class="metric-bar-bg"><div class="metric-bar bar-svd" style="width:92%">46.07%</div></div>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-label"><span>NCF Híbrido</span><span><strong>0.4066</strong></span></div>
+          <div class="metric-bar-bg"><div class="metric-bar bar-ncf" style="width:81%">40.66%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Análisis de Resultados</h3>
+      <div class="cards three" style="margin-top:10px">
+        <div>
+          <p style="font-size:13px"><strong>¿Por qué SVD supera al NCF?</strong><br>
+          El SVD es un baseline muy sólido para datos densos. El NCF fue entrenado en CPU sin tuning extensivo y con solo 20 épocas.</p>
+        </div>
+        <div>
+          <p style="font-size:13px"><strong>Ventajas del NCF Híbrido</strong><br>
+          Incorpora tags semánticos (TF-IDF) que el SVD ignora. Puede modelar relaciones no lineales y está preparado para cold-start con contenido.</p>
+        </div>
+        <div>
+          <p style="font-size:13px"><strong>Protocolo de Evaluación</strong><br>
+          500 pares de test muestreados aleatoriamente, 100 candidatos negativos por positivo, mismo split 80/20 para ambos modelos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>6 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 8 — DOCUMENTACIÓN Y CONCLUSIONES
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-header">
+    <div class="num">5</div>
+    <div>
+      <h2>Documentación y Presentación del Sistema</h2>
+      <div class="sub">Reproducibilidad, trabajo futuro y conclusiones</div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="conclusion-item">
+      <div class="icon">📦</div>
+      <div>
+        <h4>Repositorio reproducible en GitHub</h4>
+        <p>Código modular en <code>src/</code>, notebooks ordenados (01→04), setup automático para Colab con un click. Cualquier persona puede ejecutar el proyecto desde cero.</p>
+      </div>
+    </div>
+    <div class="conclusion-item">
+      <div class="icon">🧠</div>
+      <div>
+        <h4>Modelo híbrido: Collaborative Filtering + Content-Based</h4>
+        <p>El NCF combina embeddings de usuarios y artistas con features semánticas de tags (TF-IDF 50d), logrando un sistema capaz de trabajar con información multimodal.</p>
+      </div>
+    </div>
+    <div class="conclusion-item">
+      <div class="icon">📊</div>
+      <div>
+        <h4>Evaluación honesta con protocolo estándar</h4>
+        <p>Hit Rate@10 = 0.70 y NDCG@10 = 0.41. El SVD baseline resulta competitivo, lo que motiva optimización del NCF (GPU, más épocas, tuning de hiperparámetros).</p>
+      </div>
+    </div>
+    <div class="conclusion-item">
+      <div class="icon">🚀</div>
+      <div>
+        <h4>Trabajo futuro</h4>
+        <p>Incorporar la red social (user_friends) como grafo de conocimiento · Entrenamiento en GPU · Graph Neural Networks · Bandit-based exploration para recomendaciones online.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Sistema de Recomendación Musical NCF</span><span>7 / 8</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 9 — CIERRE
+══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="cover" style="background: linear-gradient(135deg, #0d1117 0%, #1a237e 60%, #1565c0 100%);">
+    <div class="badge">github.com/miguel-anay/music-recommender-ncf</div>
+    <h1>¡Gracias!</h1>
+    <div class="divider"></div>
+    <h2>Sistema de Recomendación Musical con NCF Híbrido</h2>
+    <div style="margin-top:30px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; width:100%">
+      <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:700">99.72%</div>
+        <div style="font-size:12px;opacity:0.7;margin-top:4px">Sparsity del dataset</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:700">80.3%</div>
+        <div style="font-size:12px;opacity:0.7;margin-top:4px">Reducción de loss</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:700">70%</div>
+        <div style="font-size:12px;opacity:0.7;margin-top:4px">Hit Rate@10 NCF</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
