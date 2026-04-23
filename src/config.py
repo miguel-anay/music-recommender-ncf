@@ -1,7 +1,13 @@
 from pathlib import Path
+import os
 
-DATA_DIR    = Path(__file__).parent.parent / "data" / "lastfm"
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+_COLAB_DATA    = Path('/content/lastfm')
+_COLAB_RESULTS = Path('/content/music-recommender-ncf/results')
+_LOCAL_DATA    = Path(__file__).parent.parent / "data" / "lastfm"
+_LOCAL_RESULTS = Path(__file__).parent.parent / "results"
+
+DATA_DIR    = _COLAB_DATA    if _COLAB_DATA.exists()    else _LOCAL_DATA
+RESULTS_DIR = _COLAB_RESULTS if _COLAB_DATA.exists()    else _LOCAL_RESULTS
 
 # Filtrado
 MIN_INTERACTIONS = 5
